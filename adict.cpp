@@ -1,3 +1,15 @@
+/*
+This file is part of Adict.
+
+Adict is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+Adict is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Adict. If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // Program includes
 #include "include/adict.h"
 #include "include/global_definitions.h"
@@ -9,6 +21,7 @@ using json = nlohmann::json;
 // Standard includes
 #include <iostream>
 #include <fstream>
+#include <algorithm> // for sorting words alphabetically
 
 // Methods
 
@@ -48,6 +61,11 @@ Adict Adict::read(std::string fpath) {
 }
 
 void Adict::print() {
+    // Sort words alphabetically first
+    std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
+        return a.name < b.name;
+    });
+
     for (size_t i = 0; i < words.size(); i++) {
         Word w = words.at(i);
         std::cout << "* " << w.name << ": " << w.definition << newl;
@@ -81,6 +99,11 @@ void Adict::print() {
 }
 
 DOCX Adict::compile() {
+    // Sort words alphabetically first
+    std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
+        return a.name < b.name;
+    });
+
     DOCX docx;
     for (size_t i = 0; i < words.size(); i++) {
         Word cur_word = words.at(i);

@@ -3,8 +3,8 @@
         {
             "name": "aeriform",
             "definition": "of the form or shape of gas; gaseous",
-            "etymology": ["word", "0"],
-            "examples": ["this is an example sentence containing word0"]
+            "etymology": ["aeri", "form"],
+            "examples": ["this is an example sentence containing aeriform"]
         },
 
         {
@@ -41,6 +41,35 @@
             "name": "trunnion",
             "definition": "a pin or pivot on which something can be rotated",
             "examples": "hey, that's a really nice trunnion!"
+        },
+
+        {
+            "name": "chessel",
+            "definition": "cheese-mould"
+        },
+
+        {
+            "name": "multivious",
+            "definition": "leading in many directions; offering many different paths"
+        },
+
+        {
+            "name": "tessaraglot",
+            "definition": "speaking four languages",
+            "etymology": ["tessara", "glot"],
+            "examples": "I heard that my friend became a tessaraglot, congratulations to them!"
+        },
+
+        {
+            "name": "nominalism",
+            "definition": "doctrine that naming of things defines reality",
+            "etymology": ["nominal", "-ism"]
+        },
+
+        {
+            "name": "ditrichotomous",
+            "definition": "divided into either two or three parts",
+            "etymology": ["di", "trichotomy", "-ous"]
         }
     ]
 }
