@@ -1,0 +1,46 @@
+{
+    "words": [
+        {
+            "name": "aeriform",
+            "definition": "of the form or shape of gas; gaseous",
+            "etymology": ["word", "0"],
+            "examples": ["this is an example sentence containing word0"]
+        },
+
+        {
+            "name": "obrotund",
+            "definition": "round but flattened on top and bottom",
+            "etymology": ["word", "1", "bonus"],
+            "examples": ["this is an example sentence containing word1", "this is another example sentence, yay."]
+        },
+
+        {
+            "name": "rabulous",
+            "definition": "scurrilous"
+        },
+
+        {
+            "name": "saccharimeter",
+            "definition": "instrument for measuring amount of sugar in a solution"
+        },
+
+        {
+            "name": "tautophony",
+            "definition": "repetition of the same sound",
+            "etymology": "single etymology entry",
+            "examples": "single example sentence"
+        },
+
+        {
+            "name": "symbology",
+            "definition": "study of symbols",
+            "etymology": ["symbol (en)", "-ology (idk)"]
+        },
+
+        {
+            "name": "trunnion",
+            "definition": "a pin or pivot on which something can be rotated",
+            "examples": "hey, that's a really nice trunnion!"
+        }
+    ]
+}
