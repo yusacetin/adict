@@ -1,1 +1,1 @@
-g++ -o main main.cpp adict.cpp
+g++ -o adict main.cpp adict.cpp

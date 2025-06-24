@@ -118,19 +118,37 @@ DOCX Adict::compile() {
 
         docx.add_paragraph(p);
 
+        size_t global_font_size = docx.get_global_font_size();
+        size_t subsize = global_font_size - 1;
+        if (global_font_size <= 1) {
+            subsize = 1;
+        }
+
         // Second line (etymology)
         if (!cur_word.etymology.empty()) {
             DOCX::Paragraph p2;
 
-            p2.add_italic_text("etym.");
-            p2.add_plain_text(":");
-            p2.add_space();
+            DOCX::Text etym_label("etym.");
+            etym_label.size = subsize;
+            etym_label.italic = true;
+            p2.add_text(etym_label);
+
+            DOCX::Text etym_colon(":");
+            etym_colon.size = subsize;
+            p2.add_text(etym_colon);
+
+            p2.add_space(1, subsize);
 
             for (size_t e_i = 0; e_i < cur_word.etymology.size(); e_i++) {
-                p2.add_plain_text(cur_word.etymology.at(e_i));
+                DOCX::Text etym_content(cur_word.etymology.at(e_i));
+                etym_content.size = subsize;
+                p2.add_text(etym_content);
+
                 if (e_i < cur_word.etymology.size()-1) {
-                    p2.add_plain_text(",");
-                    p2.add_space();
+                    DOCX::Text comma(",");
+                    comma.size = subsize;
+                    p2.add_text(comma);
+                    p2.add_space(1, subsize);
                 }
             }
 
@@ -141,17 +159,33 @@ DOCX Adict::compile() {
         if (!cur_word.examples.empty()) {
             DOCX::Paragraph p3;
 
-            p3.add_italic_text("ex.s.");
-            p3.add_plain_text(":");
-            p3.add_space();
+            DOCX::Text exs_label("ex.s.");
+            exs_label.size = subsize;
+            exs_label.italic = true;
+            p3.add_text(exs_label);
+
+            DOCX::Text exs_colon(":");
+            exs_colon.size = subsize;
+            p3.add_text(exs_colon);
+
+            p3.add_space(1, subsize);
 
             for (size_t e_i = 0; e_i < cur_word.examples.size(); e_i++) {
-                p3.add_plain_text("\"");
-                p3.add_plain_text(cur_word.examples.at(e_i));
-                p3.add_plain_text("\"");
+                DOCX::Text quote("\"");
+                quote.size = subsize;
+                p3.add_text(quote);
+
+                DOCX::Text exs_content(cur_word.examples.at(e_i));
+                exs_content.size = subsize;
+                p3.add_text(exs_content);
+
+                p3.add_text(quote);
+
                 if (e_i < cur_word.examples.size()-1) {
-                    p3.add_plain_text(",");
-                    p3.add_space();
+                    DOCX::Text comma(",");
+                    comma.size = subsize;
+                    p3.add_text(comma);
+                    p3.add_space(1, subsize);
                 }
             }
 
