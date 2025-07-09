@@ -29,7 +29,20 @@ Adict Adict::read(std::string fpath) {
     std::ifstream f(fpath);
     json dict_json = json::parse(f);
     Adict adict;
-    for (size_t i=0; i<dict_json["words"].size(); i++) {
+
+    if (dict_json.contains("meta")) {
+        for (auto& [key, value] : dict_json["meta"].items()) {
+            adict.meta[key] = value;
+        }
+    }
+
+    if (dict_json.contains("style")) {
+        for (auto& [key, value] : dict_json["style"].items()) {
+            adict.style[key] = value;
+        }
+    }
+
+    for (size_t i = 0; i < dict_json["words"].size(); i++) {
         Word word;
 
         word.name = dict_json["words"][i]["name"];
@@ -61,6 +74,22 @@ Adict Adict::read(std::string fpath) {
 }
 
 void Adict::print() {
+    // Print meta
+    bool meta_exists = false; // used to check if a space is necessary before the words section
+    if (meta.find("title") != meta.end()) {
+        std::cout << meta["title"] << newl;
+        meta_exists = true;
+    }
+
+    if (meta.find("first_stroke") != meta.end()) {
+        std::cout << "First Stroke: " << meta["first_stroke"] << newl;
+        meta_exists = true;
+    }
+
+    if (meta_exists) {
+        std::cout << newl;
+    }
+
     // Sort words alphabetically first
     std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
         return a.name < b.name;
@@ -105,6 +134,44 @@ DOCX Adict::compile() {
     });
 
     DOCX docx;
+
+    bool meta_exists = false; // used to check if a space is necessary before the words section
+    if (meta.find("title") != meta.end()) {
+        DOCX::Paragraph title;
+        DOCX::Text title_text(meta["title"]);
+
+        if (style.find("title_size") != style.end()) {
+            title_text.size = std::stoul(style["title_size"]);
+        } else {
+            title_text.size = 32;
+        }
+
+        title.add_text(title_text);
+        title.align = DOCX::Paragraph::CENTER;
+        docx.add_paragraph(title);
+        meta_exists = true;
+    }
+
+    if (meta.find("first_stroke") != meta.end()) {
+        DOCX::Paragraph first_stroke;
+        DOCX::Text first_stroke_text("First Stroke: " + meta["first_stroke"]);
+        
+        if (style.find("first_stroke_size") != style.end()) {
+            first_stroke_text.size = std::stoul(style["first_stroke_size"]);
+        } else {
+            first_stroke_text.size = 32;
+        }
+
+        first_stroke.add_text(first_stroke_text);
+        first_stroke.align = DOCX::Paragraph::CENTER;
+        docx.add_paragraph(first_stroke);
+        meta_exists = true;
+    }
+
+    if (meta_exists) {
+        docx.add_empty_line(2);
+    }
+
     for (size_t i = 0; i < words.size(); i++) {
         Word cur_word = words.at(i);
 

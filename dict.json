@@ -1,4 +1,14 @@
 {
+    "meta": {
+        "title": "My Dictionary",
+        "first_stroke": "2025-06-01"
+    },
+
+    "style": {
+        "title_size": "24",
+        "first_stroke_size": "12"
+    },
+
     "words": [
         {
             "name": "aeriform",

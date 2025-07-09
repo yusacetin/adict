@@ -23,6 +23,8 @@ class Adict {
 public:
     // Data variables
     std::vector<Word> words;
+    std::map<std::string, std::string> meta;
+    std::map<std::string, std::string> style;
 
     // Object functions
     void print();
