@@ -67,6 +67,36 @@ Adict Adict::read(std::string fpath) {
                 word.examples.push_back(dict_json["words"][i]["examples"]);
             }
         }
+
+        if (dict_json["words"][i].contains("example_sentences")) {
+            if (dict_json["words"][i]["example_sentences"].is_array()) {
+                for (size_t e_i=0; e_i<dict_json["words"][i]["example_sentences"].size(); e_i++) {
+                    word.example_sentences.push_back(dict_json["words"][i]["example_sentences"][e_i]);
+                }
+            } else {
+                word.example_sentences.push_back(dict_json["words"][i]["example_sentences"]);
+            }
+        }
+
+        if (dict_json["words"][i].contains("inspirations")) {
+            if (dict_json["words"][i]["inspirations"].is_array()) {
+                for (size_t e_i=0; e_i<dict_json["words"][i]["inspirations"].size(); e_i++) {
+                    word.inspirations.push_back(dict_json["words"][i]["inspirations"][e_i]);
+                }
+            } else {
+                word.inspirations.push_back(dict_json["words"][i]["inspirations"]);
+            }
+        }
+
+        if (dict_json["words"][i].contains("notes")) {
+            if (dict_json["words"][i]["notes"].is_array()) {
+                for (size_t e_i=0; e_i<dict_json["words"][i]["notes"].size(); e_i++) {
+                    word.notes.push_back(dict_json["words"][i]["notes"][e_i]);
+                }
+            } else {
+                word.notes.push_back(dict_json["words"][i]["notes"]);
+            }
+        }
         
         adict.words.push_back(word);
     }
@@ -125,6 +155,8 @@ void Adict::print() {
             std::cout << newl;
         }
     }
+
+    std::cout << newl << "Number of words: " << words.size() << newl;
 }
 
 DOCX Adict::compile() {
@@ -226,7 +258,7 @@ DOCX Adict::compile() {
         if (!cur_word.examples.empty()) {
             DOCX::Paragraph p3;
 
-            DOCX::Text exs_label("ex.s.");
+            DOCX::Text exs_label("ex.");
             exs_label.size = subsize;
             exs_label.italic = true;
             p3.add_text(exs_label);
@@ -238,17 +270,110 @@ DOCX Adict::compile() {
             p3.add_space(1, subsize);
 
             for (size_t e_i = 0; e_i < cur_word.examples.size(); e_i++) {
+                DOCX::Text exs_content(cur_word.examples.at(e_i));
+                exs_content.size = subsize;
+                p3.add_text(exs_content);
+
+                if (e_i < cur_word.examples.size()-1) {
+                    DOCX::Text comma(",");
+                    comma.size = subsize;
+                    p3.add_text(comma);
+                    p3.add_space(1, subsize);
+                }
+            }
+
+            docx.add_paragraph(p3);
+        }
+
+        // Fourth line (example sentences)
+        if (!cur_word.example_sentences.empty()) {
+            DOCX::Paragraph p3;
+
+            DOCX::Text exs_label("ex.s.");
+            exs_label.size = subsize;
+            exs_label.italic = true;
+            p3.add_text(exs_label);
+
+            DOCX::Text exs_colon(":");
+            exs_colon.size = subsize;
+            p3.add_text(exs_colon);
+
+            p3.add_space(1, subsize);
+
+            for (size_t e_i = 0; e_i < cur_word.example_sentences.size(); e_i++) {
                 DOCX::Text quote("\"");
                 quote.size = subsize;
                 p3.add_text(quote);
 
-                DOCX::Text exs_content(cur_word.examples.at(e_i));
+                DOCX::Text exs_content(cur_word.example_sentences.at(e_i));
                 exs_content.size = subsize;
                 p3.add_text(exs_content);
 
                 p3.add_text(quote);
 
-                if (e_i < cur_word.examples.size()-1) {
+                if (e_i < cur_word.example_sentences.size()-1) {
+                    DOCX::Text comma(",");
+                    comma.size = subsize;
+                    p3.add_text(comma);
+                    p3.add_space(1, subsize);
+                }
+            }
+
+            docx.add_paragraph(p3);
+        }
+
+        // Fifth line (inspirations)
+        if (!cur_word.inspirations.empty()) {
+            DOCX::Paragraph p3;
+
+            DOCX::Text insp_label("inspirations");
+            insp_label.size = subsize;
+            insp_label.italic = true;
+            p3.add_text(insp_label);
+
+            DOCX::Text insp_colon(":");
+            insp_colon.size = subsize;
+            p3.add_text(insp_colon);
+
+            p3.add_space(1, subsize);
+
+            for (size_t i_i = 0; i_i < cur_word.inspirations.size(); i_i++) {
+                DOCX::Text insp_content(cur_word.inspirations.at(i_i));
+                insp_content.size = subsize;
+                p3.add_text(insp_content);
+
+                if (i_i < cur_word.inspirations.size()-1) {
+                    DOCX::Text comma(",");
+                    comma.size = subsize;
+                    p3.add_text(comma);
+                    p3.add_space(1, subsize);
+                }
+            }
+
+            docx.add_paragraph(p3);
+        }
+
+        // Sixth line onwards (notes)
+        if (!cur_word.notes.empty()) {
+            DOCX::Paragraph p3;
+
+            DOCX::Text notes_label("notes");
+            notes_label.size = subsize;
+            notes_label.italic = true;
+            p3.add_text(notes_label);
+
+            DOCX::Text notes_colon(":");
+            notes_colon.size = subsize;
+            p3.add_text(notes_colon);
+
+            p3.add_space(1, subsize);
+
+            for (size_t n_i = 0; n_i < cur_word.notes.size(); n_i++) {
+                DOCX::Text notes_content(cur_word.notes.at(n_i));
+                notes_content.size = subsize;
+                p3.add_text(notes_content);
+
+                if (n_i < cur_word.notes.size()-1) {
                     DOCX::Text comma(",");
                     comma.size = subsize;
                     p3.add_text(comma);

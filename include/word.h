@@ -22,6 +22,9 @@ public:
     std::string definition;
     std::vector<std::string> etymology;
     std::vector<std::string> examples;
+    std::vector<std::string> example_sentences;
+    std::vector<std::string> inspirations;
+    std::vector<std::string> notes;
 };
 
 #endif
