@@ -1,12 +1,17 @@
 {
     "meta": {
         "title": "My Dictionary",
+        "subtitles": [
+            "first subtitle",
+            "First Stroke: 01/06/2025",
+            "subtitle the second"
+        ],
         "first_stroke": "2025-06-01"
     },
 
     "style": {
         "title_size": "24",
-        "first_stroke_size": "12"
+        "subtitle_size": "12"
     },
 
     "words": [

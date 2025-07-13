@@ -18,20 +18,30 @@ You should have received a copy of the GNU General Public License along with Adi
 
 #include <string>
 #include <vector>
+#include <set>
 
 class Adict {
 public:
-    // Data variables
-    std::vector<Word> words;
-    std::map<std::string, std::string> meta;
-    std::map<std::string, std::string> style;
-
     // Object functions
     void print();
     DOCX compile();
 
     // Static functions
     static Adict read(std::string fpath);
+
+private:
+    // Data variables
+    std::vector<Word> words;
+    std::map<std::string, std::string> meta;
+    std::map<std::string, std::string> style;
+    std::vector<std::string> subtitles;
+    std::map<std::string, std::vector<Word>> categories;
+
+    // Program variables
+    std::set<std::string> exclude_from_main;
+
+    // Program functions
+    static std::vector<DOCX::Paragraph> get_vector_of_paragraphs_from_word(Word w, DOCX docx);
 };
 
 #endif
