@@ -11,7 +11,8 @@
 
     "style": {
         "title_size": "24",
-        "subtitle_size": "12"
+        "subtitle_size": "12",
+        "section_title_size": "16"
     },
 
     "words": [

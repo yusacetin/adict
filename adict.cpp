@@ -282,9 +282,15 @@ DOCX Adict::compile() {
     for (auto it = categories.rbegin(); it != categories.rend(); ++it) {
         docx.add_empty_line();
 
+        // check if custom title size is set for sections (categories)
+        size_t category_title_size = 14;
+        if (style.find("section_title_size") != style.end()) {
+            category_title_size = std::stoul(style["section_title_size"]);
+        }
+
         DOCX::Paragraph category_title_p;
         DOCX::Text category_title_t(it->first);
-        category_title_t.size = 14;
+        category_title_t.size = category_title_size;
         category_title_t.bold = true;
         category_title_p.add_text(category_title_t);
         docx.add_paragraph(category_title_p);
