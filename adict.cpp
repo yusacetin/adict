@@ -21,7 +21,7 @@ using json = nlohmann::json;
 // Standard includes
 #include <iostream>
 #include <fstream>
-#include <algorithm> // for sorting words alphabetically
+#include <algorithm> // for sort and find
 
 // Methods
 
@@ -48,6 +48,17 @@ Adict Adict::read(std::string fpath) {
     if (dict_json.contains("style")) {
         for (auto& [key, value] : dict_json["style"].items()) {
             adict.style[key] = value;
+        }
+    }
+
+    {
+        if (dict_json.contains("config") && dict_json["config"].contains("category_order")) {
+            adict.category_order = dict_json["config"]["category_order"].get<std::vector<std::string>>();
+            if (std::find(adict.category_order.begin(), adict.category_order.end(), "*") == adict.category_order.end()) {
+                adict.category_order.insert(adict.category_order.begin(), "*");
+            }
+        } else {
+            adict.category_order.insert(adict.category_order.begin(), "*");
         }
     }
 
@@ -110,14 +121,13 @@ Adict Adict::read(std::string fpath) {
         if (dict_json["words"][i].contains("category")) {
             if (dict_json["words"][i]["category"].is_array()) {
                 std::cerr << "Error, each word can only be in one category" << newl;
-                continue;
             } else {
-                adict.categories[dict_json["words"][i]["category"]].push_back(word);
-                adict.exclude_from_main.insert(word.name);
+                adict.words_by_category[dict_json["words"][i]["category"]].push_back(word);
             }
+            continue;
         }
-        
-        adict.words.push_back(word);
+
+        adict.words_by_category["*"].push_back(word);
     }
     return adict;
 }
@@ -139,53 +149,22 @@ void Adict::print() {
         std::cout << newl;
     }
 
-    // Sort words alphabetically first
-    std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
-        return a.name < b.name;
-    });
+    size_t word_count = 0;
+    for (size_t i = 0; i < category_order.size(); i++) {
+        std::string category = category_order[i];
+        std::vector<Word> words = words_by_category[category];
+        word_count += words.size();
 
-    for (size_t i = 0; i < words.size(); i++) {
-        Word w = words.at(i);
+        // Sort words alphabetically first
+        std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
+            return a.name < b.name;
+        });
 
-        if (exclude_from_main.find(w.name) != exclude_from_main.end()) {
-            continue; // this word should be printed in its own category later
-        }
-
-        std::cout << "* " << w.name << ": " << w.definition << newl;
-
-        if (w.etymology.size() > 0) {
-            std::cout << "+> etym.: ";
-            for (size_t i=0; i<w.etymology.size(); i++) {
-                std::cout << w.etymology.at(i);
-                if (i != w.etymology.size()-1) {
-                    std::cout << " + ";
-                }
-            }
-            std::cout << newl;
-        }
-        
-        if (w.examples.size() > 0) {
-            std::cout << "+> examples: ";
-            for (size_t i=0; i<w.examples.size(); i++) {
-                std::cout << w.examples.at(i);
-                if (i != w.examples.size()-1) {
-                    std::cout << ", ";
-                }
-            }
-            std::cout << newl;
-        }
-
-        if (i < words.size()-1) {
-            std::cout << newl;
-        }
-    }
-
-    for (auto it = categories.rbegin(); it != categories.rend(); ++it) {
         std::cout << newl;
-        std::cout << it->first << newl;
+        std::cout << category << newl;
         std::cout << "--------" << newl << newl;
-        for (size_t w_i = 0; w_i < it->second.size(); w_i++) {
-            Word w = it->second.at(w_i);
+        for (size_t w_i = 0; w_i < words.size(); w_i++) {
+            Word w = words.at(w_i);
             std::cout << "* " << w.name << ": " << w.definition << newl;
 
             if (w.etymology.size() > 0) {
@@ -210,21 +189,16 @@ void Adict::print() {
                 std::cout << newl;
             }
 
-            if (w_i < it->second.size()-1) {
+            if (w_i < words.size()-1) {
                 std::cout << newl;
             }
         }
     }
 
-    std::cout << newl << "Number of words: " << words.size() << newl;
+    std::cout << newl << "Number of words: " << word_count << newl;
 }
 
 DOCX Adict::compile() {
-    // Sort words alphabetically first
-    std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
-        return a.name < b.name;
-    });
-
     DOCX docx;
 
     bool meta_exists = false; // used to check if a space is necessary before the words section
@@ -236,6 +210,10 @@ DOCX Adict::compile() {
             title_t.size = std::stoul(style["title_size"]);
         } else {
             title_t.size = 32;
+        }
+
+        if (style.find("title_typeface") != style.end()) {
+            title_t.typeface = style["title_typeface"];
         }
 
         title_p.add_text(title_t);
@@ -261,25 +239,18 @@ DOCX Adict::compile() {
     }
 
     if (meta_exists) {
-        docx.add_empty_line(2);
+        docx.add_empty_line(1);
     }
 
-    for (size_t i = 0; i < words.size(); i++) {
-        Word w = words.at(i);
-        if (exclude_from_main.find(w.name) != exclude_from_main.end()) {
-            continue; // write words with categories at the end
-        }
-        std::vector<DOCX::Paragraph> vp = Adict::get_vector_of_paragraphs_from_word(w, docx);
-        for (size_t p_i = 0; p_i < vp.size(); p_i++) {
-            DOCX::Paragraph p = vp.at(p_i);
-            docx.add_paragraph(p);
-        }
-        if (i < words.size()-1) {
-            docx.add_empty_line();
-        }
-    }
+    for (int i = 0; i < category_order.size(); i++) {
+        std::string category = category_order[i];
+        std::vector<Word> words = words_by_category[category];
 
-    for (auto it = categories.rbegin(); it != categories.rend(); ++it) {
+        // Sort words alphabetically first
+        std::sort(words.begin(), words.end(), [](const Word& a, const Word& b) {
+            return a.name < b.name;
+        });
+
         docx.add_empty_line();
 
         // check if custom title size is set for sections (categories)
@@ -288,23 +259,24 @@ DOCX Adict::compile() {
             category_title_size = std::stoul(style["section_title_size"]);
         }
 
-        DOCX::Paragraph category_title_p;
-        DOCX::Text category_title_t(it->first);
-        category_title_t.size = category_title_size;
-        category_title_t.bold = true;
-        category_title_p.add_text(category_title_t);
-        docx.add_paragraph(category_title_p);
+        if (category != "*") {
+            DOCX::Paragraph category_title_p;
+            DOCX::Text category_title_t(category);
+            category_title_t.size = category_title_size;
+            category_title_t.bold = true;
+            category_title_p.add_text(category_title_t);
+            docx.add_paragraph(category_title_p);
+            docx.add_empty_line();
+        }
 
-        docx.add_empty_line();
-
-        for (size_t w_i = 0; w_i < it->second.size(); w_i++) {
-            Word w = it->second.at(w_i);
+        for (size_t w_i = 0; w_i < words.size(); w_i++) {
+            Word w = words.at(w_i);
             std::vector<DOCX::Paragraph> vp = Adict::get_vector_of_paragraphs_from_word(w, docx);
             for (size_t p_i = 0; p_i < vp.size(); p_i++) {
                 DOCX::Paragraph p = vp.at(p_i);
                 docx.add_paragraph(p);
             }
-            if (w_i < it->second.size()-1) {
+            if (w_i < words.size()-1) {
                 docx.add_empty_line();
             }
         }
@@ -313,7 +285,7 @@ DOCX Adict::compile() {
     return docx;
 }
 
-std::vector<DOCX::Paragraph> Adict::get_vector_of_paragraphs_from_word(Word cur_word, DOCX docx) {
+std::vector<DOCX::Paragraph> Adict::get_vector_of_paragraphs_from_word(Word cur_word, DOCX& docx) {
     std::vector<DOCX::Paragraph> vp;
 
     // Fist line (name and definition)

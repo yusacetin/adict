@@ -31,17 +31,14 @@ public:
 
 private:
     // Data variables
-    std::vector<Word> words;
     std::map<std::string, std::string> meta;
     std::map<std::string, std::string> style;
     std::vector<std::string> subtitles;
-    std::map<std::string, std::vector<Word>> categories;
-
-    // Program variables
-    std::set<std::string> exclude_from_main;
+    std::map<std::string, std::vector<Word>> words_by_category;
+    std::vector<std::string> category_order;
 
     // Program functions
-    static std::vector<DOCX::Paragraph> get_vector_of_paragraphs_from_word(Word w, DOCX docx);
+    static std::vector<DOCX::Paragraph> get_vector_of_paragraphs_from_word(Word w, DOCX& docx);
 };
 
 #endif
