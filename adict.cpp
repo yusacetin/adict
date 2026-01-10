@@ -200,6 +200,16 @@ void Adict::print() {
 
 DOCX Adict::compile() {
     DOCX docx;
+    
+    {
+        ScriptAnalyzer::latin_typeface = "Georgia";
+        ScriptAnalyzer::japanese_typeface = "Noto Serif JP";
+        ScriptAnalyzer::arabic_typeface = "Noto Naskh Arabic";
+        ScriptAnalyzer::cyrillic_typeface = "Merriweather";
+        ScriptAnalyzer::devanagari_typeface = "Noto Serif Devanagari";
+        ScriptAnalyzer::greek_typeface = "Source Serif 4";
+        docx.enable_script_analyzer();
+    }
 
     bool meta_exists = false; // used to check if a space is necessary before the words section
     if (meta.find("title") != meta.end()) {
