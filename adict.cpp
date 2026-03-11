@@ -208,6 +208,7 @@ DOCX Adict::compile() {
         ScriptAnalyzer::cyrillic_typeface = "Merriweather";
         ScriptAnalyzer::devanagari_typeface = "Noto Serif Devanagari";
         ScriptAnalyzer::greek_typeface = "Source Serif 4";
+        ScriptAnalyzer::set_force_use_latin_typeface_for_latin_punctuation(true);
         docx.enable_script_analyzer();
     }
 
